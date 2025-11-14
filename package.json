@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+  "dev": "\"C:\\Users\\HWebb\\Desktop\\Code\\node\\node.exe\" node_modules\\vite\\bin\\vite.js",
+  "build": "\"C:\\Users\\HWebb\\Desktop\\Code\\node\\node.exe\" node_modules\\vite\\bin\\vite.js build",
+  "lint": "\"C:\\Users\\HWebb\\Desktop\\Code\\node\\node.exe\" node_modules\\eslint\\bin\\eslint.js .",
+  "preview": "\"C:\\Users\\HWebb\\Desktop\\Code\\node\\node.exe\" node_modules\\vite\\bin\\vite.js preview",
+  "start": "C:\\Users\\HWebb\\Desktop\\Code\\node\\node.exe index.js"
   },
   "dependencies": {
     "react": "^19.2.0",
