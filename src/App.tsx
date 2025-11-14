@@ -11,10 +11,10 @@ function App() {
     <div className = "app-container">
       <header>
         <h1>BudgetWise</h1>
-        <nav>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/transactions">Transactions</Link>
-          <Link to="/budgets">Budgets</Link>
+        <nav style={{padding: '1rem', backgroundColor: '#eee'}}>
+          <Link to="/dashboard">Dashboard </Link>
+          <Link to="/transactions">Transactions </Link>
+          <Link to="/budgets">Budgets </Link>
         </nav>
       </header>
 
