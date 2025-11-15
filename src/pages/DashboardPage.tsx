@@ -1,6 +1,9 @@
 function DashboardPage() {
   return (
-    <div>Dashboard (WASM-powered insights coming soon!)</div>
+    <div>
+      <h2>Dashboard</h2>
+      <p>Dashboard (WASM-powered insights coming soon!)</p>
+    </div>
   )
 }
 export default DashboardPage

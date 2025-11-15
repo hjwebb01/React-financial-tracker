@@ -1,6 +1,9 @@
 function BudgetsPage() {
   return (
-    <div>Budgets</div>
+    <div>
+      <h2>Budgets</h2>
+      <p>Budgets (WASM-powered insights coming soon!)</p>
+    </div>
   )
 }
 export default BudgetsPage;
