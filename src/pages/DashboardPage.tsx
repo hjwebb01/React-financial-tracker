@@ -1,96 +1,112 @@
-import { useEffect, useMemo, useState } from "react";
-import { sampleTransactions } from "../sampleData";
-import { sumInt32 } from "../wasm/financeWasm";
+import { useMemo } from "react";
+import { useMonthlyAggregates } from "../hooks/useAggregates";
+import { sampleCategories, formatMoney } from "../utils/finance";
 
 function DashboardPage() {
-  const formatMoney = (amountCents: number) => (amountCents / 100).toFixed(2);
+  const { totalSpent, totalIncome, netBalance, categorySpendMap, topCategory, budgetStats } = useMonthlyAggregates();
 
-  const [totalCentsFromWasm, setTotalCentsFromWasm] = useState<number | null>(
-    null
-  );
-  const [isLoadingTotal, setIsLoadingTotal] = useState<boolean>(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const sortedCategories = useMemo(() => {
+    return Array.from(categorySpendMap.entries())
+      .map(([categoryId, spent]) => ({
+        categoryId,
+        spent,
+        name: sampleCategories.find(c => c.id === categoryId)?.name ?? categoryId,
+      }))
+      .sort((a, b) => b.spent - a.spent);
+  }, [categorySpendMap]);
 
-  const amountsInt32 = useMemo(
-    () => new Int32Array(sampleTransactions.map((tx) => tx.amountCents)),
-    []
-  );
-
-  const sumCentsJs = (values: Int32Array): number => {
-    let total = 0;
-    for (let i = 0; i < values.length; i++) {
-      total += values[i];
-    }
-    return total;
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      setIsLoadingTotal(true);
-      setLoadError(null);
-      try {
-        // Quick WASM sanity check: sumInt32([1,2,3]) should be 6
-        try {
-          const testResult = await sumInt32(new Int32Array([1, 2, 3]));
-          console.log("WASM test sumInt32([1,2,3]) =", testResult);
-        } catch (testErr) {
-          console.error("WASM test sumInt32([1,2,3]) failed", testErr);
-        }
-
-        const result = await sumInt32(amountsInt32);
-        if (!cancelled) {
-          setTotalCentsFromWasm(result);
-        }
-      } catch (err) {
-        console.error("WASM sumInt32 failed, falling back to JS sum", err);
-        const fallback = sumCentsJs(amountsInt32);
-        if (!cancelled) {
-          setTotalCentsFromWasm(fallback);
-          setLoadError(
-            "Could not load WASM backend, using JS fallback for totals."
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingTotal(false);
-        }
-      }
-    };
-
-    void run();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [amountsInt32]);
+  const maxSpent = sortedCategories.length > 0 ? sortedCategories[0].spent : 1;
 
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <p>Dashboard (WASM-powered insights coming soon!)</p>
-      <p>Number of transactions: {sampleTransactions.length}</p>
-      <p>Sample transactions:</p>
-      <ul>
-        {sampleTransactions.map((transaction) => (
-          <li key={transaction.id}>
-            {transaction.date} - {transaction.description} -{" "}
-            {transaction.category} - ${formatMoney(transaction.amountCents)}
-          </li>
-        ))}
-      </ul>
+    <div className="dashboard-page">
+      <header className="dashboard-header">
+        <h2>Dashboard</h2>
+        <p>Current month overview of your finances.</p>
+      </header>
 
-      <hr />
+      <section className="dashboard-kpis">
+        <div className="kpi-card">
+          <div className="kpi-icon">💰</div>
+          <div className="kpi-content">
+            <h3>Total Spent</h3>
+            <p className="kpi-value negative">{formatMoney(totalSpent)}</p>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon">💸</div>
+          <div className="kpi-content">
+            <h3>Total Income</h3>
+            <p className="kpi-value positive">{formatMoney(totalIncome)}</p>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon">⚖️</div>
+          <div className="kpi-content">
+            <h3>Net Balance</h3>
+            <p className={`kpi-value ${netBalance >= 0 ? 'positive' : 'negative'}`}>{formatMoney(netBalance)}</p>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon">📈</div>
+          <div className="kpi-content">
+            <h3>Top Category</h3>
+            <p className="kpi-value">
+              {topCategory.categoryId ? sampleCategories.find(c => c.id === topCategory.categoryId)?.name : 'None'}
+            </p>
+            <p className="kpi-sub">{formatMoney(topCategory.spent)}</p>
+          </div>
+        </div>
+      </section>
 
-      <h3>Total from WASM</h3>
-      {isLoadingTotal && <p>Calculating total via WASM…</p>}
-      {!isLoadingTotal && loadError && <p>{loadError}</p>}
-      {!isLoadingTotal && totalCentsFromWasm !== null && (
-        <p>
-          Total spent (WASM or fallback): ${formatMoney(totalCentsFromWasm)}
-        </p>
+      <section className="dashboard-chart">
+        <h3>Spending by Category</h3>
+        {sortedCategories.length === 0 ? (
+          <p className="empty-state">No spending this month yet.</p>
+        ) : (
+          <div className="category-chart">
+            {sortedCategories.map(({ categoryId, spent, name }) => (
+              <div key={categoryId} className="chart-bar">
+                <div className="chart-label">
+                  <span className="category-name">{name}</span>
+                  <span className="category-amount">{formatMoney(spent)}</span>
+                </div>
+                <div className="chart-bar-container">
+                  <div
+                    className="chart-bar-fill"
+                    style={{ width: `${(spent / maxSpent) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {budgetStats.length > 0 && (
+        <section className="dashboard-budgets">
+          <h3>Budget Status</h3>
+          <div className="budget-status-list">
+            {budgetStats.map((stat) => (
+              <div key={stat.id} className="budget-status">
+                <div className="budget-status-header">
+                  <span className="budget-category">{sampleCategories.find(c => c.id === stat.categoryId)?.name}</span>
+                  <span className={`budget-remaining ${stat.isOver ? 'over' : ''}`}>
+                    {formatMoney(stat.remaining)} left
+                  </span>
+                </div>
+                <div className="budget-progress">
+                  <div
+                    className={`progress-bar ${stat.isOver ? 'over' : ''}`}
+                    style={{ width: `${Math.min(stat.percentUsed, 100)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
 }
+
 export default DashboardPage;
