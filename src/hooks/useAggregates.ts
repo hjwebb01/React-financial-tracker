@@ -24,7 +24,7 @@ export function useMonthlyAggregates() {
   );
 
   const totalIncome = useMemo(() =>
-    currentMonthTxs.filter(tx => tx.amountCents > 0).reduce((sum, tx) => sum + tx.amountCents, 0), []
+    currentMonthTxs.filter(tx => tx.amountCents > 0).reduce((sum, tx) => sum + tx.amountCents, 0), [currentMonthTxs]
   );
 
   const netBalance = totalIncome + totalSpent; // spent is negative

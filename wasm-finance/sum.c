@@ -23,7 +23,9 @@ int32_t sum_int32(const int32_t *values, int32_t length) {
 
 // Sum amounts for a specific category within date range.
 // timestamps in milliseconds since epoch.
+// The time range is half-open: [start_ts, end_ts), i.e., start_ts is inclusive and end_ts is exclusive.
 // Returns sum in cents.
+int32_t sum_by_category(int32_t category_index, int64_t start_ts, int64_t end_ts, const int64_t *timestamps, const int32_t *amounts, const int32_t *category_indices, int32_t length) {
 int32_t sum_by_category(int32_t category_index, int64_t start_ts, int64_t end_ts, const int64_t *timestamps, const int32_t *amounts, const int32_t *category_indices, int32_t length) {
     if (timestamps == 0 || amounts == 0 || category_indices == 0 || length <= 0) {
         return 0;
@@ -55,18 +57,41 @@ int32_t sum_by_month(int32_t year, int32_t month, const int64_t *timestamps, con
 
     int64_t total = 0;
     for (int32_t i = 0; i < length; i++) {
-        // Simple month check: assuming timestamps are in ms
-        // Get year and month from timestamp
-        // Note: this is simplified, real date math would use proper calendar
         int64_t ts = timestamps[i];
-        // Approximate: days since 1970, etc. For demo, assume timestamps are valid
-        // Actually, to get year/month, need to convert to date.
-        // For simplicity, since JS will filter, but to follow plan, implement basic.
-        // Wait, perhaps better to have JS filter and use sum_int32.
-        // But to implement, let's assume we pass filtered amounts.
-        // Wait, the function is sum_by_month, but to make it work, perhaps change to take filtered amounts.
-        // For now, implement as sum all, since month filtering can be done in JS.
-        total += amounts[i];
+        // Convert timestamp (ms since epoch) to year and month (UTC)
+        int64_t days = ts / 86400000;
+        int64_t y = 1970;
+        int64_t m = 0;
+        int64_t d = 0;
+        int64_t days_in_month[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+        // Calculate year
+        while (1) {
+            int leap = ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) ? 1 : 0;
+            int days_this_year = leap ? 366 : 365;
+            if (days >= days_this_year) {
+                days -= days_this_year;
+                y++;
+            } else {
+                break;
+            }
+        }
+        // Calculate month
+        for (m = 0; m < 12; m++) {
+            int dim = days_in_month[m];
+            // February leap year
+            if (m == 1 && ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0))) {
+                dim = 29;
+            }
+            if (days >= dim) {
+                days -= dim;
+            } else {
+                break;
+            }
+        }
+        d = days + 1;
+        if (y == year && m == month) {
+            total += amounts[i];
+        }
     }
 
     if (total > 2147483647) {

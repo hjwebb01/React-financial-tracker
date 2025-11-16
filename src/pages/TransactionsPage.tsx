@@ -357,9 +357,12 @@ function TransactionsPage() {
           className="transactions-modal-backdrop"
           role="dialog"
           aria-modal="true"
-          style={{ pointerEvents: 'none' }}
+          onClick={() => setEditingTx(null)}
         >
-          <div className="transactions-modal" style={{ pointerEvents: 'auto' }}>
+          <div
+            className="transactions-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <header>
               <h3>Edit transaction</h3>
               <button
