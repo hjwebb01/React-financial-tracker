@@ -1,6 +1,6 @@
 /* Finance Dashboard Styles */
 
-.app-container {
+.app-container{
   min-height: 100vh;
   background-color: #1a1a1a;
   color: white;
@@ -181,10 +181,6 @@
   color: white;
 }
 
-.stat-category {
-  color: #60a5fa;
-}
-
 .stat-icon-wrapper {
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -207,10 +203,6 @@
   color: #3b82f6;
 }
 
-.icon-purple {
-  color: #8b5cf6;
-}
-
 .bg-orange {
   background-color: rgba(249, 115, 22, 0.1);
 }
@@ -221,10 +213,6 @@
 
 .bg-blue {
   background-color: rgba(59, 130, 246, 0.1);
-}
-
-.bg-purple {
-  background-color: rgba(139, 92, 246, 0.1);
 }
 
 /* Charts Grid */
@@ -261,166 +249,18 @@
   color: #9ca3af;
 }
 
-.chart-container {
-  height: 300px;
-}
-
-.chart-container-large {
-  height: 350px;
-}
-
-/* Recent Transactions */
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #374151;
-  border-radius: 0.5rem;
-  transition: border-color 0.2s;
-}
-
-.transaction-item:hover {
-  border-color: #4b5563;
-}
-
-.transaction-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.transaction-icon-wrapper {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-}
-
-.transaction-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.transaction-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.transaction-description {
-  color: white;
-}
-
-.transaction-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.transaction-badge {
-  background-color: #374151;
-  color: #d1d5db;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.transaction-date {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.transaction-amount {
-  font-weight: 500;
-}
-
-.amount-negative {
-  color: #f87171;
-}
-
-.amount-positive {
-  color: #34d399;
-}
-
-/* Legacy styles for compatibility */
-.router-link {
-  color: #646cff;
-  text-decoration: none;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background-color 0.25s;
-}
-
-.router-link:hover {
-  background-color: #646cff11;
-}
-
-.router-link.active {
-  background-color: #646cff33;
-}
-
-.dashboard-chart {
-  margin-top: 2rem;
-  text-align: left;
-}
-
-.category-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.chart-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.chart-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  color: #f2f2f2;
-  gap: 0.5rem;
-}
-
-.category-percent {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #646cff;
-}
-
-.chart-bar-container {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background-color: #f2f2f2;
-  overflow: hidden;
-}
-
-.chart-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #646cff, #a573ff);
-  transition: width 0.3s ease;
-}
-
-
-
-
-
-/*Budgets page*/
-
+/* Budgets page */
 .budgets-container {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
 /* Forms */
@@ -591,6 +431,20 @@
   color: white;
 }
 
+/* Transaction badges and dates */
+.transaction-badge {
+  background-color: #374151;
+  color: #d1d5db;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.transaction-date {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
 /* Paycheck specific */
 .paycheck-icon-wrapper {
   padding: 0.5rem;
@@ -718,3 +572,5 @@
   font-size: 0.875rem;
   color: #9ca3af;
 }
+
+/* Transactions page - styles will be added when content is implemented */
