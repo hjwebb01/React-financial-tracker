@@ -47,7 +47,7 @@ export function Budgets() {
   const [paychecks, setPaychecks] = useState<Paycheck[]>([]);
   const [showBillForm, setShowBillForm] = useState(false);
   const [showPaycheckForm, setShowPaycheckForm] = useState(false);
-  const [newBill, setNewBill] = useState({ name: '', amount: '', dueDate: '', category: 'Utilities' });
+  const [newBill, setNewBill] = useState({ name: '', amount: '', dueDate: '', category: '' });
   const [newPaycheck, setNewPaycheck] = useState<NewPaycheckForm>({
     source: '',
     amount: '',
@@ -306,18 +306,13 @@ export function Budgets() {
                 onChange={(e) => setNewBill((prev) => ({ ...prev, dueDate: e.target.value }))}
                 className="budget-input"
               />
-              <select
+              <input
+                type="text"
                 value={newBill.category}
                 onChange={(e) => setNewBill((prev) => ({ ...prev, category: e.target.value }))}
-                className="budget-select"
-              >
-                <option value="Housing">Housing</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Insurance">Insurance</option>
-                <option value="Health">Health</option>
-                <option value="Transportation">Transportation</option>
-                <option value="Other">Other</option>
-              </select>
+                className="budget-input"
+                placeholder="Enter category"
+              />
               <div className="form-actions">
                 <button onClick={handleAddBill} className="save-button">Save</button>
                 <button onClick={() => setShowBillForm(false)} className="cancel-button">Cancel</button>
@@ -393,7 +388,7 @@ export function Budgets() {
               </select>
               <input
                 type="number"
-                placeholder="First payday of month (1-31)"
+                placeholder="First payday of month"
                 min="1"
                 max={daysInMonth}
                 value={newPaycheck.firstDay}
