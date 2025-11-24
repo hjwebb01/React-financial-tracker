@@ -1,11 +1,23 @@
 import { useMemo, useState } from "react";
 import { Wallet, TrendingUp, Calendar, DollarSign } from "lucide-react";
 
+import financialDataRaw from "../assets/financial_data.csv?raw";
+
 export function Dashboard() {
-  // Mock data - will be replaced with actual data later
-  const [currentBalance] = useState(5000.0);
-  const [monthlyBills] = useState(2500.0); // Placeholder for monthly bills total
-  const [monthlyIncome] = useState(4000.0); // Placeholder for monthly income
+  // Parse CSV data
+  const data = useMemo(() => {
+    const lines = financialDataRaw.trim().split('\n');
+    const values = lines[1].split(',');
+    return {
+      currentBalance: parseFloat(values[0]),
+      monthlyBills: parseFloat(values[1]),
+      monthlyIncome: parseFloat(values[2])
+    };
+  }, []);
+
+  const [currentBalance] = useState(data.currentBalance);
+  const [monthlyBills] = useState(data.monthlyBills); 
+  const [monthlyIncome] = useState(data.monthlyIncome);
 
   const currentDate = useMemo(() => new Date(), []);
   const currentMonth = useMemo(() => {
