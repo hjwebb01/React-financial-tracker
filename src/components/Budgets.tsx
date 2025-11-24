@@ -1,5 +1,13 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Plus, DollarSign, Trash2, CreditCard, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCallback, useMemo, useState } from "react";
+import {
+  Plus,
+  DollarSign,
+  Trash2,
+  CreditCard,
+  Wallet,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface Bill {
   id: string;
@@ -16,19 +24,19 @@ interface Paycheck {
   id: string;
   source: string;
   amount: number;
-  frequency: 'weekly' | 'biweekly' | 'monthly';
+  frequency: "weekly" | "biweekly" | "monthly";
   monthlyAnchors: Record<string, number>;
 }
 
 type NewPaycheckForm = {
   source: string;
   amount: string;
-  frequency: Paycheck['frequency'];
+  frequency: Paycheck["frequency"];
   firstDay: string;
 };
 
 interface TimelineItem {
-  type: 'bill' | 'paycheck';
+  type: "bill" | "paycheck";
   date: number;
   name: string;
   amount: number;
@@ -36,10 +44,10 @@ interface TimelineItem {
 }
 
 const getOrdinal = (day: number) => {
-  const suffixes: Record<number, string> = { 1: 'st', 2: 'nd', 3: 'rd' };
+  const suffixes: Record<number, string> = { 1: "st", 2: "nd", 3: "rd" };
   const remainder = day % 100;
   if (remainder >= 11 && remainder <= 13) return `${day}th`;
-  return `${day}${suffixes[day % 10] ?? 'th'}`;
+  return `${day}${suffixes[day % 10] ?? "th"}`;
 };
 
 export function Budgets() {
@@ -47,47 +55,69 @@ export function Budgets() {
   const [paychecks, setPaychecks] = useState<Paycheck[]>([]);
   const [showBillForm, setShowBillForm] = useState(false);
   const [showPaycheckForm, setShowPaycheckForm] = useState(false);
-  const [newBill, setNewBill] = useState({ name: '', amount: '', dueDate: '', category: '' });
-  const [newPaycheck, setNewPaycheck] = useState<NewPaycheckForm>({
-    source: '',
-    amount: '',
-    frequency: 'monthly',
-    firstDay: ''
+  const [newBill, setNewBill] = useState({
+    name: "",
+    amount: "",
+    dueDate: "",
+    category: "",
   });
-  const [monthlyDayInputs, setMonthlyDayInputs] = useState<Record<string, string>>({});
+  const [newPaycheck, setNewPaycheck] = useState<NewPaycheckForm>({
+    source: "",
+    amount: "",
+    frequency: "monthly",
+    firstDay: "",
+  });
+  const [monthlyDayInputs, setMonthlyDayInputs] = useState<
+    Record<string, string>
+  >({});
   const [viewDate, setViewDate] = useState(new Date());
   const monthKey = useMemo(() => {
-    return `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}`;
+    return `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`;
   }, [viewDate]);
 
   const monthLabel = useMemo(() => {
-    return viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return viewDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
   }, [viewDate]);
 
   const daysInMonth = useMemo(() => {
-    return new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    return new Date(
+      viewDate.getFullYear(),
+      viewDate.getMonth() + 1,
+      0
+    ).getDate();
   }, [viewDate]);
 
   const goPrevMonth = useCallback(() => {
-    setViewDate((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1));
+    setViewDate(
+      (current) => new Date(current.getFullYear(), current.getMonth() - 1, 1)
+    );
   }, []);
 
   const goNextMonth = useCallback(() => {
-    setViewDate((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1));
+    setViewDate(
+      (current) => new Date(current.getFullYear(), current.getMonth() + 1, 1)
+    );
   }, []);
 
-  const getInterval = (frequency: Paycheck['frequency']) => {
+  const getInterval = (frequency: Paycheck["frequency"]) => {
     switch (frequency) {
-      case 'weekly':
+      case "weekly":
         return 7;
-      case 'biweekly':
+      case "biweekly":
         return 14;
       default:
         return 31;
     }
   };
 
-  const generateOccurrences = (anchor: number, interval: number, monthLength: number) => {
+  const generateOccurrences = (
+    anchor: number,
+    interval: number,
+    monthLength: number
+  ) => {
     const dates: number[] = [];
     for (let day = anchor; day <= monthLength; day += interval) {
       dates.push(day);
@@ -97,7 +127,7 @@ export function Budgets() {
 
   const formatDayLabel = (day: number) => {
     const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
     return `${dayName}, ${getOrdinal(day)}`;
   };
 
@@ -114,18 +144,23 @@ export function Budgets() {
           category: newBill.category,
           isPaid: false,
           monthlyAnchors: {
-            [monthKey]: firstDay
-          }
-        }
+            [monthKey]: firstDay,
+          },
+        },
       ]);
-      setNewBill({ name: '', amount: '', dueDate: '', category: 'Utilities' });
+      setNewBill({ name: "", amount: "", dueDate: "", category: "Utilities" });
       setShowBillForm(false);
     }
   };
 
   const handleAddPaycheck = () => {
     const firstDay = parseInt(newPaycheck.firstDay);
-    if (newPaycheck.source && newPaycheck.amount && firstDay && firstDay <= daysInMonth) {
+    if (
+      newPaycheck.source &&
+      newPaycheck.amount &&
+      firstDay &&
+      firstDay <= daysInMonth
+    ) {
       setPaychecks((prev) => [
         ...prev,
         {
@@ -134,12 +169,17 @@ export function Budgets() {
           amount: parseFloat(newPaycheck.amount),
           frequency: newPaycheck.frequency,
           monthlyAnchors: {
-            [monthKey]: firstDay
-          }
-        }
+            [monthKey]: firstDay,
+          },
+        },
       ]);
-      setNewPaycheck({ source: '', amount: '', frequency: 'monthly', firstDay: '' });
-      setMonthlyDayInputs((prev) => ({ ...prev, [monthKey]: '' }));
+      setNewPaycheck({
+        source: "",
+        amount: "",
+        frequency: "monthly",
+        firstDay: "",
+      });
+      setMonthlyDayInputs((prev) => ({ ...prev, [monthKey]: "" }));
       setShowPaycheckForm(false);
     }
   };
@@ -154,7 +194,9 @@ export function Budgets() {
 
   const toggleBillPaid = (id: string) => {
     setBills((prev) =>
-      prev.map((bill) => (bill.id === id ? { ...bill, isPaid: !bill.isPaid } : bill))
+      prev.map((bill) =>
+        bill.id === id ? { ...bill, isPaid: !bill.isPaid } : bill
+      )
     );
   };
 
@@ -166,8 +208,8 @@ export function Budgets() {
           ...paycheck,
           monthlyAnchors: {
             ...paycheck.monthlyAnchors,
-            [monthKey]: day
-          }
+            [monthKey]: day,
+          },
         };
       })
     );
@@ -186,10 +228,10 @@ export function Budgets() {
       const occurrences = generateOccurrences(anchor, interval, daysInMonth);
       occurrences.forEach((day) => {
         items.push({
-          type: 'paycheck',
+          type: "paycheck",
           date: day,
           name: paycheck.source,
-          amount: paycheck.amount
+          amount: paycheck.amount,
         });
       });
     });
@@ -198,104 +240,138 @@ export function Budgets() {
 
   const timelineItems = useMemo(() => {
     const billItems = sortedBills.map((bill) => ({
-      type: 'bill' as const,
+      type: "bill" as const,
       date: bill.monthlyAnchors[monthKey] ?? bill.baseDueDay ?? bill.dueDate,
       name: bill.name,
       amount: bill.amount,
-      isPaid: bill.isPaid
+      isPaid: bill.isPaid,
     }));
-    return [...billItems, ...paychecksWithOccurrences].sort((a, b) => a.date - b.date);
+    return [...billItems, ...paychecksWithOccurrences].sort(
+      (a, b) => a.date - b.date
+    );
   }, [paychecksWithOccurrences, sortedBills, monthKey]);
 
-  const totalIncome = paychecksWithOccurrences.reduce((sum, item) => sum + item.amount, 0);
+  const totalIncome = paychecksWithOccurrences.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
   const totalBills = sortedBills.reduce((sum, bill) => sum + bill.amount, 0);
 
   return (
-    <div className="budgets-container">
-      <div className="time-toggle">
-        <button onClick={goPrevMonth} className="time-toggle-btn inactive" title="Previous month">
+    <div className="flex flex-col gap-8">
+      <div className="flex justify-center gap-2 mb-8">
+        <button
+          onClick={goPrevMonth}
+          className="px-6 py-2 rounded-md bg-transparent text-gray-400 hover:text-gray-300 transition-colors"
+          title="Previous month"
+        >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="time-toggle-btn active">{monthLabel}</div>
-        <button onClick={goNextMonth} className="time-toggle-btn inactive" title="Next month">
+        <div className="px-6 py-2 rounded-md bg-gray-700 text-white">
+          {monthLabel}
+        </div>
+        <button
+          onClick={goNextMonth}
+          className="px-6 py-2 rounded-md bg-transparent text-gray-400 hover:text-gray-300 transition-colors"
+          title="Next month"
+        >
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
       {/* Summary */}
-      <div className="finance-overview-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
-        <div className="stat-card">
-          <div className="stat-card-content">
-            <div className="stat-info">
-              <p className="stat-label">Projected income for {monthLabel}</p>
-              <div className="stat-values">
-                <p className="stat-value">${totalIncome.toFixed(2)}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-2">
+              <p className="text-gray-400 text-sm">
+                Projected income for {monthLabel}
+              </p>
+              <div className="flex flex-col gap-1">
+                <p className="text-white text-xl font-semibold">
+                  ${totalIncome.toFixed(2)}
+                </p>
               </div>
             </div>
-            <div className="stat-icon-wrapper bg-green">
-              <DollarSign className="stat-icon icon-green" />
+            <div className="p-3 rounded-lg bg-green-500/10">
+              <DollarSign className="w-5 h-5 text-green-500" />
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-card-content">
-            <div className="stat-info">
-              <p className="stat-label">Projected spending</p>
-              <div className="stat-values">
-                <p className="stat-value">${totalBills.toFixed(2)}</p>
+        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-2">
+              <p className="text-gray-400 text-sm">Projected spending</p>
+              <div className="flex flex-col gap-1">
+                <p className="text-white text-xl font-semibold">
+                  ${totalBills.toFixed(2)}
+                </p>
               </div>
             </div>
-            <div className="stat-icon-wrapper bg-orange">
-              <CreditCard className="stat-icon icon-orange" />
+            <div className="p-3 rounded-lg bg-orange-500/10">
+              <CreditCard className="w-5 h-5 text-orange-500" />
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-card-content">
-            <div className="stat-info">
-              <p className="stat-label">Remaining</p>
-              <div className="stat-values">
-                <p className="stat-value">${(totalIncome - totalBills).toFixed(2)}</p>
+        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-2">
+              <p className="text-gray-400 text-sm">Remaining</p>
+              <div className="flex flex-col gap-1">
+                <p className="text-white text-xl font-semibold">
+                  ${(totalIncome - totalBills).toFixed(2)}
+                </p>
               </div>
             </div>
-            <div className="stat-icon-wrapper bg-blue">
-              <Wallet className="stat-icon icon-blue" />
+            <div className="p-3 rounded-lg bg-blue-500/10">
+              <Wallet className="w-5 h-5 text-blue-500" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Content grid */}
-      <div className="charts-grid">
-        <div className="chart-card">
-          <div className="budget-header">
-            <div className="chart-header">
-              <h3 className="chart-title">Monthly Bills</h3>
-              <p className="chart-subtitle">Track your recurring expenses</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="mb-4">
+              <h3 className="text-white text-lg font-semibold mb-1">
+                Monthly Bills
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Track your recurring expenses
+              </p>
             </div>
-            <button onClick={() => setShowBillForm((prev) => !prev)} className="add-button">
-              <Plus className="add-icon" />
+            <button
+              onClick={() => setShowBillForm((prev) => !prev)}
+              className="flex items-center gap-1 bg-blue-600 text-white border-none px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
               Add Bill
             </button>
           </div>
 
           {showBillForm && (
-            <div className="budget-form">
+            <div className="bg-[#1f1f1f] border border-gray-700 rounded-lg p-4 mb-4 flex flex-col gap-3">
               <input
                 type="text"
                 placeholder="Bill name"
                 value={newBill.name}
-                onChange={(e) => setNewBill((prev) => ({ ...prev, name: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewBill((prev) => ({ ...prev, name: e.target.value }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
               <input
                 type="number"
                 placeholder="Amount"
                 value={newBill.amount}
-                onChange={(e) => setNewBill((prev) => ({ ...prev, amount: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewBill((prev) => ({ ...prev, amount: e.target.value }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
               <input
                 type="number"
@@ -303,45 +379,80 @@ export function Budgets() {
                 min="1"
                 max="31"
                 value={newBill.dueDate}
-                onChange={(e) => setNewBill((prev) => ({ ...prev, dueDate: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewBill((prev) => ({ ...prev, dueDate: e.target.value }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
               <input
                 type="text"
                 value={newBill.category}
-                onChange={(e) => setNewBill((prev) => ({ ...prev, category: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewBill((prev) => ({ ...prev, category: e.target.value }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
                 placeholder="Enter category"
               />
-              <div className="form-actions">
-                <button onClick={handleAddBill} className="save-button">Save</button>
-                <button onClick={() => setShowBillForm(false)} className="cancel-button">Cancel</button>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleAddBill}
+                  className="bg-blue-600 text-white border-none px-3 py-1.5 rounded-md text-sm cursor-pointer"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setShowBillForm(false)}
+                  className="bg-transparent text-gray-400 border border-gray-700 px-3 py-1.5 rounded-md text-sm cursor-pointer hover:text-white hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           )}
 
-          <div className="budget-list">
+          <div className="flex flex-col gap-2">
             {sortedBills.map((bill) => (
-              <div key={bill.id} className={`budget-item ${bill.isPaid ? 'budget-item-paid' : ''}`}>
-                <div className="budget-item-left">
+              <div
+                key={bill.id}
+                className={`flex items-center justify-between p-3 bg-[#1f1f1f] border border-gray-700 rounded-lg transition-all ${
+                  bill.isPaid ? "opacity-60" : ""
+                }`}
+              >
+                <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
                     checked={bill.isPaid}
                     onChange={() => toggleBillPaid(bill.id)}
-                    className="budget-checkbox"
+                    className="w-4.5 h-4.5 cursor-pointer accent-blue-600"
                   />
-                  <div className="budget-item-info">
-                    <p className={`budget-item-name ${bill.isPaid ? 'budget-item-name-paid' : ''}`}>{bill.name}</p>
-            <div className="budget-item-meta">
-              <span className="transaction-badge">{bill.category}</span>
-              <span className="transaction-date">Due: {formatDayLabel(bill.monthlyAnchors[monthKey] ?? bill.dueDate)}</span>
-            </div>
+                  <div className="flex flex-col gap-0.5">
+                    <p
+                      className={`font-medium text-white ${bill.isPaid ? "line-through text-gray-400" : ""}`}
+                    >
+                      {bill.name}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-sm">
+                        {bill.category}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        Due:{" "}
+                        {formatDayLabel(
+                          bill.monthlyAnchors[monthKey] ?? bill.dueDate
+                        )}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="budget-item-right">
-                  <p className="budget-item-amount">${bill.amount.toFixed(2)}</p>
-                  <button onClick={() => deleteBill(bill.id)} className="delete-button">
-                    <Trash2 className="delete-icon" />
+                <div className="flex items-center gap-3">
+                  <p className="font-semibold text-white">
+                    ${bill.amount.toFixed(2)}
+                  </p>
+                  <button
+                    onClick={() => deleteBill(bill.id)}
+                    className="bg-transparent border-none text-gray-500 cursor-pointer p-1 rounded flex items-center justify-center hover:text-red-500 hover:bg-red-500/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -349,38 +460,60 @@ export function Budgets() {
           </div>
         </div>
 
-        <div className="chart-card">
-          <div className="budget-header">
-            <div className="chart-header">
-              <h3 className="chart-title">Income Sources</h3>
-              <p className="chart-subtitle">Manage your recurring paychecks</p>
+        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="mb-4">
+              <h3 className="text-white text-lg font-semibold mb-1">
+                Income Sources
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Manage your recurring paychecks
+              </p>
             </div>
-            <button onClick={() => setShowPaycheckForm((prev) => !prev)} className="add-button">
-              <Plus className="add-icon" />
+            <button
+              onClick={() => setShowPaycheckForm((prev) => !prev)}
+              className="flex items-center gap-1 bg-blue-600 text-white border-none px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
               Add Income
             </button>
           </div>
 
           {showPaycheckForm && (
-            <div className="budget-form">
+            <div className="bg-[#1f1f1f] border border-gray-700 rounded-lg p-4 mb-4 flex flex-col gap-3">
               <input
                 type="text"
                 placeholder="Income source"
                 value={newPaycheck.source}
-                onChange={(e) => setNewPaycheck((prev) => ({ ...prev, source: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewPaycheck((prev) => ({
+                    ...prev,
+                    source: e.target.value,
+                  }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
               <input
                 type="number"
                 placeholder="Amount"
                 value={newPaycheck.amount}
-                onChange={(e) => setNewPaycheck((prev) => ({ ...prev, amount: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewPaycheck((prev) => ({
+                    ...prev,
+                    amount: e.target.value,
+                  }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
               <select
                 value={newPaycheck.frequency}
-                onChange={(e) => setNewPaycheck((prev) => ({ ...prev, frequency: e.target.value as Paycheck['frequency'] }))}
-                className="budget-select"
+                onChange={(e) =>
+                  setNewPaycheck((prev) => ({
+                    ...prev,
+                    frequency: e.target.value as Paycheck["frequency"],
+                  }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               >
                 <option value="weekly">Weekly</option>
                 <option value="biweekly">Bi-weekly</option>
@@ -392,65 +525,105 @@ export function Budgets() {
                 min="1"
                 max={daysInMonth}
                 value={newPaycheck.firstDay}
-                onChange={(e) => setNewPaycheck((prev) => ({ ...prev, firstDay: e.target.value }))}
-                className="budget-input"
+                onChange={(e) =>
+                  setNewPaycheck((prev) => ({
+                    ...prev,
+                    firstDay: e.target.value,
+                  }))
+                }
+                className="px-3 py-2 bg-[#111315] border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:border-blue-400"
               />
-              <div className="form-actions">
-                <button onClick={handleAddPaycheck} className="save-button">Save</button>
-                <button onClick={() => setShowPaycheckForm(false)} className="cancel-button">Cancel</button>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleAddPaycheck}
+                  className="bg-blue-600 text-white border-none px-3 py-1.5 rounded-md text-sm cursor-pointer"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setShowPaycheckForm(false)}
+                  className="bg-transparent text-gray-400 border border-gray-700 px-3 py-1.5 rounded-md text-sm cursor-pointer hover:text-white hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           )}
 
-          <div className="budget-list">
+          <div className="flex flex-col gap-2">
             {paychecks.map((paycheck) => {
               const firstDay = paycheck.monthlyAnchors[monthKey];
-              const inputValue = monthlyDayInputs[paycheck.id] ?? (firstDay ? firstDay.toString() : '');
+              const inputValue =
+                monthlyDayInputs[paycheck.id] ??
+                (firstDay ? firstDay.toString() : "");
 
               return (
-                <div key={paycheck.id} className="budget-item">
-                  <div className="budget-item-left">
-                    <div className="paycheck-icon-wrapper">
-                      <DollarSign className="paycheck-icon" />
+                <div
+                  key={paycheck.id}
+                  className="flex items-center justify-between p-3 bg-[#1f1f1f] border border-gray-700 rounded-lg transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-500/10 rounded-md">
+                      <DollarSign className="w-4 h-4 text-green-500" />
                     </div>
-                    <div className="budget-item-info">
-                      <p className="budget-item-name">{paycheck.source}</p>
-                      <div className="budget-item-meta">
-                        <span className="transaction-badge paycheck-badge">{paycheck.frequency}</span>
-                        <span className="transaction-date">
-                          {firstDay ? `First payday: ${formatDayLabel(firstDay)}` : `Set first payday for ${monthLabel}`}
+                    <div className="flex flex-col gap-0.5">
+                      <p className="font-medium text-white">
+                        {paycheck.source}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="bg-green-500/10 text-green-400 px-2 py-0.5 rounded text-sm">
+                          {paycheck.frequency}
+                        </span>
+                        <span className="text-gray-500 text-sm">
+                          {firstDay
+                            ? `First payday: ${formatDayLabel(firstDay)}`
+                            : `Set first payday for ${monthLabel}`}
                         </span>
                       </div>
-                      <div className="paycheck-month-actions">
+                      <div className="flex items-center gap-2 mt-1">
                         <input
                           type="number"
                           min="1"
                           max={daysInMonth}
                           value={inputValue}
                           onChange={(e) =>
-                            setMonthlyDayInputs((prev) => ({ ...prev, [paycheck.id]: e.target.value }))
+                            setMonthlyDayInputs((prev) => ({
+                              ...prev,
+                              [paycheck.id]: e.target.value,
+                            }))
                           }
-                          className="paycheck-month-input"
+                          className="w-16 px-2 py-1 bg-[#111315] border border-gray-700 rounded text-white text-sm focus:outline-none focus:border-blue-400"
                         />
                         <button
                           onClick={() => {
                             const day = parseInt(inputValue);
                             if (day && day >= 1 && day <= daysInMonth) {
                               updatePaycheckFirstDayForView(paycheck.id, day);
-                              setMonthlyDayInputs((prev) => ({ ...prev, [paycheck.id]: '' }));
+                              setMonthlyDayInputs((prev) => ({
+                                ...prev,
+                                [paycheck.id]: "",
+                              }));
                             }
                           }}
-                          className="paycheck-month-button"
+                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                         >
-                          Apply for {viewDate.toLocaleDateString('en-US', { month: 'short' })}
+                          Apply for{" "}
+                          {viewDate.toLocaleDateString("en-US", {
+                            month: "short",
+                          })}
                         </button>
                       </div>
                     </div>
                   </div>
-                  <div className="budget-item-right">
-                    <p className="budget-item-amount paycheck-amount">${paycheck.amount.toFixed(2)}</p>
-                    <button onClick={() => deletePaycheck(paycheck.id)} className="delete-button">
-                      <Trash2 className="delete-icon" />
+                  <div className="flex items-center gap-3">
+                    <p className="font-semibold text-green-400">
+                      ${paycheck.amount.toFixed(2)}
+                    </p>
+                    <button
+                      onClick={() => deletePaycheck(paycheck.id)}
+                      className="bg-transparent border-none text-gray-500 cursor-pointer p-1 rounded flex items-center justify-center hover:text-red-500 hover:bg-red-500/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -460,52 +633,77 @@ export function Budgets() {
         </div>
       </div>
 
-      <div className="chart-card">
-        <div className="chart-header">
-          <h3 className="chart-title">Monthly Timeline</h3>
-          <p className="chart-subtitle">Projected cash flow for {monthLabel}</p>
+      <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+        <div className="mb-4">
+          <h3 className="text-white text-lg font-semibold mb-1">
+            Monthly Timeline
+          </h3>
+          <p className="text-gray-400 text-sm">
+            Projected cash flow for {monthLabel}
+          </p>
         </div>
-        <div className="timeline">
-          {timelineItems.reduce<Array<{ item: TimelineItem; runningTotal: number; index: number }>>(
-            (acc, item, index) => {
-              const previousTotal = acc.length > 0 ? acc[acc.length - 1].runningTotal : 0;
+        <div className="flex flex-col relative pl-6 border-l-2 border-gray-700 ml-2 gap-6">
+          {timelineItems
+            .reduce<
+              Array<{ item: TimelineItem; runningTotal: number; index: number }>
+            >((acc, item, index) => {
+              const previousTotal =
+                acc.length > 0 ? acc[acc.length - 1].runningTotal : 0;
               const runningTotal =
-                item.type === 'paycheck' ? previousTotal + item.amount : previousTotal - item.amount;
+                item.type === "paycheck"
+                  ? previousTotal + item.amount
+                  : previousTotal - item.amount;
               acc.push({ item, runningTotal, index });
               return acc;
-            },
-            []
-          ).map(({ item, runningTotal, index }) => (
-            <div
-              key={`${item.type}-${item.date}-${index}`}
-              className={`timeline-item ${item.type === 'paycheck' ? 'timeline-item-income' : ''}`}
-            >
-              <div className="timeline-date">
-                <span className="timeline-day">{formatDayLabel(item.date)}</span>
-              </div>
-              <div className="timeline-content">
-                <div className="timeline-dot" />
-                <div className="timeline-card">
-                  <div className="timeline-info">
-                    <p className={`timeline-name ${item.type === 'bill' && item.isPaid ? 'timeline-name-paid' : ''}`}>
-                      {item.name}
-                    </p>
-                    <span className={`timeline-type ${item.type === 'paycheck' ? 'timeline-type-income' : 'timeline-type-expense'}`}>
-                      {item.type === 'paycheck' ? 'Income' : 'Bill'}
-                    </span>
-                  </div>
-                  <div className="timeline-amount-wrapper">
-                    <p className={`timeline-amount ${item.type === 'paycheck' ? 'timeline-amount-income' : 'timeline-amount-expense'}`}>
-                      {item.type === 'paycheck' ? '+' : '-'}${item.amount.toFixed(2)}
-                    </p>
-                    <p className="timeline-rolling-total">
-                      ${runningTotal.toFixed(2)}
-                    </p>
+            }, [])
+            .map(({ item, runningTotal, index }) => (
+              <div
+                key={`${item.type}-${item.date}-${index}`}
+                className="relative"
+              >
+                <div className="mb-2">
+                  <span className="text-sm text-gray-400 font-medium">
+                    {formatDayLabel(item.date)}
+                  </span>
+                </div>
+                <div className="relative">
+                  <div
+                    className={`absolute left-[-1.95rem] top-6 w-3 h-3 rounded-full border-2 border-[#1a1a1a] ${
+                      item.type === "paycheck" ? "bg-green-500" : "bg-gray-700"
+                    }`}
+                  />
+                  <div className="bg-[#1f1f1f] border border-gray-700 rounded-lg p-4 flex justify-between items-center">
+                    <div className="flex flex-col gap-1">
+                      <p
+                        className={`font-medium text-white ${
+                          item.type === "bill" && item.isPaid
+                            ? "line-through text-gray-400"
+                            : ""
+                        }`}
+                      >
+                        {item.name}
+                      </p>
+                      <span
+                        className={`text-xs ${item.type === "paycheck" ? "text-green-400" : "text-red-400"}`}
+                      >
+                        {item.type === "paycheck" ? "Income" : "Bill"}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <p
+                        className={`font-semibold ${item.type === "paycheck" ? "text-green-400" : "text-white"}`}
+                      >
+                        {item.type === "paycheck" ? "+" : "-"}$
+                        {item.amount.toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        ${runningTotal.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
