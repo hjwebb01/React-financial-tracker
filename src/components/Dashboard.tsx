@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Wallet, TrendingUp, Calendar, DollarSign } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
+import { SumCard } from "./ui/SumCard";
 
 export default function Dashboard() {
   const { financialData, transactions } = useFinance();
@@ -36,69 +37,37 @@ export default function Dashboard() {
     <div className="flex flex-col gap-8">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Current Balance</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${currentBalance.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-blue-500/10">
-              <Wallet className="w-5 h-5 text-blue-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Current Balance"
+          value={currentBalance}
+          icon={Wallet}
+          iconBgColor="bg-blue-500/10"
+          iconColor="text-blue-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Projected Balance</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${projectedBalance.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-green-500/10">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Projected Balance"
+          value={projectedBalance}
+          icon={TrendingUp}
+          iconBgColor="bg-green-500/10"
+          iconColor="text-green-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Income</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${incomeTotal.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-green-500/10">
-              <DollarSign className="w-5 h-5 text-green-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Income"
+          value={incomeTotal}
+          icon={DollarSign}
+          iconBgColor="bg-green-500/10"
+          iconColor="text-green-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Bills</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${billsTotal.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-orange-500/10">
-              <Calendar className="w-5 h-5 text-orange-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Bills"
+          value={billsTotal}
+          icon={Calendar}
+          iconBgColor="bg-orange-500/10"
+          iconColor="text-orange-500"
+        />
       </div>
 
       {/* Projected Change Card */}
