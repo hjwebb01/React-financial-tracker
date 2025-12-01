@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Wallet, TrendingUp, Calendar, DollarSign } from "lucide-react";
-
 import { useFinance } from "../context/FinanceContext";
 import { SumCard } from "./ui/SumCard";
 import { ProjectedChangeCard } from "./ui/ProjectedChangeCard";
