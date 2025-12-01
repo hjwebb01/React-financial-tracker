@@ -10,6 +10,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useFinance } from "../context/FinanceContext";
+import { SumCard } from "./ui/SumCard";
+import { ProjectedChangeCard } from "./ui/ProjectedChangeCard";
+import { BalanceProjectionCard } from "./ui/BalanceProjectionCard";
 
 export default function Dashboard() {
   const { financialData, transactions } = useFinance();
@@ -91,104 +94,48 @@ export default function Dashboard() {
     <div className="flex flex-col gap-8">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Current Balance</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${currentBalance.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-blue-500/10">
-              <Wallet className="w-5 h-5 text-blue-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Current Balance"
+          value={currentBalance}
+          icon={Wallet}
+          iconBgColor="bg-blue-500/10"
+          iconColor="text-blue-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Projected Balance</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${projectedBalance.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-green-500/10">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Projected Balance"
+          value={projectedBalance}
+          icon={TrendingUp}
+          iconBgColor="bg-green-500/10"
+          iconColor="text-green-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Income</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${incomeTotal.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-green-500/10">
-              <DollarSign className="w-5 h-5 text-green-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Income"
+          value={incomeTotal}
+          icon={DollarSign}
+          iconBgColor="bg-green-500/10"
+          iconColor="text-green-500"
+        />
 
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-400 text-sm">Bills</p>
-              <div className="flex flex-col gap-1">
-                <p className="text-white text-xl font-semibold">
-                  ${billsTotal.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 rounded-lg bg-orange-500/10">
-              <Calendar className="w-5 h-5 text-orange-500" />
-            </div>
-          </div>
-        </div>
+        <SumCard
+          title="Bills"
+          value={billsTotal}
+          icon={Calendar}
+          iconBgColor="bg-orange-500/10"
+          iconColor="text-orange-500"
+        />
       </div>
 
       {/* Projected Change Card */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
-          <div className="mb-4">
-            <h3 className="text-white text-lg font-semibold mb-1">
-              Projected Change
-            </h3>
-            <p className="text-gray-400 text-sm">
-              Expected net change after all transactions are completed
-            </p>
-          </div>
-          <div className="mt-4">
-            <div
-              className={`bg-[#2a2a2a] border rounded-lg p-6 ${netChange >= 0 ? "bg-green-500/10 border-green-500" : "bg-red-500/10 border-red-500"}`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-400 text-sm">
-                    {netChange >= 0 ? "Projected Gain" : "Projected Loss"}
-                  </p>
-                  <div className="flex flex-col gap-1">
-                    <p
-                      className={`text-3xl font-bold ${netChange >= 0 ? "text-green-500" : "text-red-500"}`}
-                    >
-                      {netChange >= 0 ? "+" : ""}${netChange.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProjectedChangeCard
+          value={netChange}
+          positiveLabel="Projected Gain"
+          negativeLabel="Projected Loss"
+        />
 
+<<<<<<< HEAD
         <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
           <div className="mb-4">
             <h3 className="text-white text-lg font-semibold mb-1">
@@ -264,6 +211,13 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+=======
+        <BalanceProjectionCard
+          currentValue={currentBalance}
+          projectedValue={projectedBalance}
+          netChange={netChange}
+        />
+>>>>>>> 7ecd6714da791d2f3cfb69e515e2caf2a0e6eaa1
       </div>
     </div>
   );
