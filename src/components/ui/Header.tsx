@@ -36,4 +36,3 @@ export function Header({ tabs, activeTab, onTabChange }: HeaderProps) {
   );
 }
 
-

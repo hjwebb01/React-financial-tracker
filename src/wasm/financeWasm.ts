@@ -89,8 +89,6 @@ export async function sumByType(
 
     const filterTypeValue = filterType === "income" ? 1 : 0;
     const resultCents = module._sum_by_type(amountsPtr, typesPtr, length, filterTypeValue);
-    
-    // Convert from cents back to dollars
     return resultCents / 100;
   } finally {
     module._free(amountsPtr);
@@ -116,7 +114,7 @@ export async function calculateRunningBalances(
 
   const amountsBytes = length * Int32Array.BYTES_PER_ELEMENT;
   const typesBytes = length * Int32Array.BYTES_PER_ELEMENT;
-  const outputBytes = length * 2 * Int32Array.BYTES_PER_ELEMENT; // 2 values per transaction
+  const outputBytes = length * 2 * Int32Array.BYTES_PER_ELEMENT;
 
   const amountsPtr = module._malloc(amountsBytes);
   const typesPtr = module._malloc(typesBytes);
@@ -132,10 +130,7 @@ export async function calculateRunningBalances(
     const startBalanceCents = Math.round(startBalance * 100);
     module._calculate_running_balances(amountsPtr, typesPtr, startBalanceCents, outputPtr, length);
 
-    // Read results from WASM memory
     const results = new Int32Array(module.HEAP32.buffer, outputPtr, length * 2);
-    
-    // Convert to array of {before, after} objects, converting from cents to dollars
     const balances: Array<{ before: number; after: number }> = [];
     for (let i = 0; i < length; i++) {
       balances.push({
@@ -151,5 +146,4 @@ export async function calculateRunningBalances(
     module._free(outputPtr);
   }
 }
-
 

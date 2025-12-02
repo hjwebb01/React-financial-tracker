@@ -9,23 +9,11 @@ import {
 import financialDataRaw from "../assets/financial_data.csv?raw";
 import { sumByType } from "../wasm/financeWasm";
 
-// Extend Transaction type or create a new one if needed for the MVP
-// The existing Transaction type in types/finance.ts is:
-// export type Transaction = {
-//   id: string;
-//   date: string;
-//   description: string;
-//   categoryId: string;
-//   amountCents: number;
-// };
-
-// For this MVP, we might want a simpler structure or just use that.
-// Let's stick to a shape that works for the MVP.
 export type MVPTransaction = {
   id: string;
   date: string;
   description: string;
-  amount: number; // using number for simplicity in MVP, representing dollars or whatever the user inputs
+  amount: number;
   type: "income" | "expense";
 };
 
@@ -61,7 +49,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyBills, setMonthlyBills] = useState(0);
 
-  // Load current balance from CSV
   useEffect(() => {
     const lines = financialDataRaw.trim().split("\n");
     if (lines.length > 1) {
@@ -70,7 +57,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Save transactions to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
@@ -79,7 +65,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     }
   }, [transactions]);
 
-  // Calculate monthly income and bills using WASM
   useEffect(() => {
     if (transactions.length === 0) {
       setMonthlyIncome(0);
@@ -87,7 +72,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Prepare data arrays for WASM
     const amountsCents = new Int32Array(
       transactions.map((t) => Math.round(t.amount * 100))
     );
@@ -95,7 +79,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       transactions.map((t) => (t.type === "income" ? 1 : 0))
     );
 
-    // Calculate using WASM
     Promise.all([
       sumByType(amountsCents, typeFlags, "income"),
       sumByType(amountsCents, typeFlags, "expense"),
@@ -106,7 +89,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       })
       .catch((error) => {
         console.error("WASM calculation error:", error);
-        // Fallback to JavaScript calculation
         setMonthlyIncome(
           transactions
             .filter((t) => t.type === "income")

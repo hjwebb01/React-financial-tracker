@@ -13,22 +13,18 @@ export default function Transactions() {
   });
   const [transactionBalances, setTransactionBalances] = useState<Map<string, { before: number; after: number }>>(new Map());
 
-  // Calculate balance before and after each transaction using WASM
   useEffect(() => {
     if (transactions.length === 0) {
       setTransactionBalances(new Map());
       return;
     }
 
-    // Sort transactions chronologically (by date, then by order added)
     const sortedTransactions = [...transactions].sort((a, b) => {
       const dateCompare = a.date.localeCompare(b.date);
       if (dateCompare !== 0) return dateCompare;
-      // If dates are equal, maintain original order (by index)
       return transactions.indexOf(a) - transactions.indexOf(b);
     });
 
-    // Prepare data arrays for WASM
     const amountsCents = new Int32Array(
       sortedTransactions.map((t) => Math.round(t.amount * 100))
     );
@@ -36,10 +32,8 @@ export default function Transactions() {
       sortedTransactions.map((t) => (t.type === "income" ? 1 : 0))
     );
 
-    // Calculate using WASM
     calculateRunningBalances(amountsCents, typeFlags, financialData.currentBalance)
       .then((balances) => {
-        // Map results back to transaction IDs
         const balancesMap = new Map<string, { before: number; after: number }>();
         sortedTransactions.forEach((transaction, index) => {
           balancesMap.set(transaction.id, balances[index]);
@@ -48,7 +42,6 @@ export default function Transactions() {
       })
       .catch((error) => {
         console.error("WASM balance calculation error:", error);
-        // Fallback to JavaScript calculation
         const balances = new Map<string, { before: number; after: number }>();
         let runningBalance = financialData.currentBalance;
         
@@ -85,7 +78,6 @@ export default function Transactions() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Add Transaction Form */}
       <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
         <h2 className="text-xl font-semibold text-white mb-6">
           Add Transaction
@@ -186,7 +178,6 @@ export default function Transactions() {
         </form>
       </div>
 
-      {/* Recent Transactions List */}
       <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">
