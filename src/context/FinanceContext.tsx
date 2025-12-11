@@ -7,7 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import financialDataRaw from "../assets/financial_data.csv?raw";
-import { sumByType } from "../wasm/financeWasm";
+import { sumByType } from "../utils/financeMath";
+import { SEED_TRANSACTIONS } from "../data/seedTransactions";
 
 export type MVPTransaction = {
   id: string;
@@ -33,42 +34,29 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
-const STORAGE_KEY = "financial-tracker-transactions";
-
 export function FinanceProvider({ children }: { children: ReactNode }) {
-  const [currentBalance, setCurrentBalance] = useState(0);
-  const [transactions, setTransactions] = useState<MVPTransaction[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error("Failed to load transactions from localStorage:", error);
-      return [];
+  const [currentBalance] = useState(() => {
+    const lines = financialDataRaw.trim().split("\n");
+    if (lines.length > 1) {
+      const values = lines[1].split(",");
+      return parseFloat(values[0]);
     }
+    return 0;
   });
+  const transactions = SEED_TRANSACTIONS;
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyBills, setMonthlyBills] = useState(0);
 
   useEffect(() => {
-    const lines = financialDataRaw.trim().split("\n");
-    if (lines.length > 1) {
-      const values = lines[1].split(",");
-      setCurrentBalance(parseFloat(values[0]));
-    }
-  }, []);
+    let cancelled = false;
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-    } catch (error) {
-      console.error("Failed to save transactions to localStorage:", error);
-    }
-  }, [transactions]);
-
-  useEffect(() => {
     if (transactions.length === 0) {
-      setMonthlyIncome(0);
-      setMonthlyBills(0);
+      queueMicrotask(() => {
+        if (!cancelled) {
+          setMonthlyIncome(0);
+          setMonthlyBills(0);
+        }
+      });
       return;
     }
 
@@ -84,22 +72,30 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       sumByType(amountsCents, typeFlags, "expense"),
     ])
       .then(([income, bills]) => {
-        setMonthlyIncome(income);
-        setMonthlyBills(bills);
+        if (!cancelled) {
+          setMonthlyIncome(income);
+          setMonthlyBills(bills);
+        }
       })
       .catch((error) => {
-        console.error("WASM calculation error:", error);
-        setMonthlyIncome(
-          transactions
-            .filter((t) => t.type === "income")
-            .reduce((acc, t) => acc + t.amount, 0)
-        );
-        setMonthlyBills(
-          transactions
-            .filter((t) => t.type === "expense")
-            .reduce((acc, t) => acc + t.amount, 0)
-        );
+        if (!cancelled) {
+          console.error("Calculation error:", error);
+          setMonthlyIncome(
+            transactions
+              .filter((t) => t.type === "income")
+              .reduce((acc, t) => acc + t.amount, 0)
+          );
+          setMonthlyBills(
+            transactions
+              .filter((t) => t.type === "expense")
+              .reduce((acc, t) => acc + t.amount, 0)
+          );
+        }
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [transactions]);
 
   const financialData = useMemo(
@@ -108,39 +104,31 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       monthlyBills,
       monthlyIncome,
     }),
-    [currentBalance, monthlyBills, monthlyIncome],
+    [currentBalance, monthlyBills, monthlyIncome]
   );
 
-  const addTransaction = (transaction: Omit<MVPTransaction, "id">) => {
-    const newTransaction = {
-      ...transaction,
-      id: crypto.randomUUID(),
-    };
-    setTransactions((prev) => [...prev, newTransaction]);
-  };
+  const addTransaction = () => {};
 
-  const removeTransaction = (id: string) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
-  };
+  const removeTransaction = () => {};
 
-  const clearTransactions = () => {
-    setTransactions([]);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.error("Failed to clear transactions from localStorage:", error);
-    }
-  };
+  const clearTransactions = () => {};
 
   return (
     <FinanceContext.Provider
-      value={{ financialData, transactions, addTransaction, removeTransaction, clearTransactions }}
+      value={{
+        financialData,
+        transactions,
+        addTransaction,
+        removeTransaction,
+        clearTransactions,
+      }}
     >
       {children}
     </FinanceContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useFinance() {
   const context = useContext(FinanceContext);
   if (context === undefined) {

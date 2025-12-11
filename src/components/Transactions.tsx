@@ -1,17 +1,33 @@
 import { useState, useEffect } from "react";
 import { useFinance } from "../context/FinanceContext";
-import { Plus, Minus, Calendar, Tag, DollarSign, Trash2, X } from "lucide-react";
-import { calculateRunningBalances } from "../wasm/financeWasm";
+import {
+  Plus,
+  Minus,
+  Calendar,
+  Tag,
+  DollarSign,
+  Trash2,
+  X,
+} from "lucide-react";
+import { calculateRunningBalances } from "../utils/financeMath";
 
 export default function Transactions() {
-  const { addTransaction, transactions, removeTransaction, financialData, clearTransactions } = useFinance();
+  const {
+    addTransaction,
+    transactions,
+    removeTransaction,
+    financialData,
+    clearTransactions,
+  } = useFinance();
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
     description: "",
     amount: "",
     type: "income" as "income" | "expense",
   });
-  const [transactionBalances, setTransactionBalances] = useState<Map<string, { before: number; after: number }>>(new Map());
+  const [transactionBalances, setTransactionBalances] = useState<
+    Map<string, { before: number; after: number }>
+  >(new Map());
 
   useEffect(() => {
     if (transactions.length === 0) {
@@ -32,27 +48,41 @@ export default function Transactions() {
       sortedTransactions.map((t) => (t.type === "income" ? 1 : 0))
     );
 
-    calculateRunningBalances(amountsCents, typeFlags, financialData.currentBalance)
+    calculateRunningBalances(
+      amountsCents,
+      typeFlags,
+      financialData.currentBalance
+    )
       .then((balances) => {
-        const balancesMap = new Map<string, { before: number; after: number }>();
+        const balancesMap = new Map<
+          string,
+          { before: number; after: number }
+        >();
         sortedTransactions.forEach((transaction, index) => {
           balancesMap.set(transaction.id, balances[index]);
         });
         setTransactionBalances(balancesMap);
       })
       .catch((error) => {
-        console.error("WASM balance calculation error:", error);
+        console.error("Balance calculation error:", error);
         const balances = new Map<string, { before: number; after: number }>();
         let runningBalance = financialData.currentBalance;
-        
+
         sortedTransactions.forEach((transaction) => {
           const balanceBefore = runningBalance;
-          const balanceAfter = runningBalance + (transaction.type === "income" ? transaction.amount : -transaction.amount);
-          
-          balances.set(transaction.id, { before: balanceBefore, after: balanceAfter });
+          const balanceAfter =
+            runningBalance +
+            (transaction.type === "income"
+              ? transaction.amount
+              : -transaction.amount);
+
+          balances.set(transaction.id, {
+            before: balanceBefore,
+            after: balanceAfter,
+          });
           runningBalance = balanceAfter;
         });
-        
+
         setTransactionBalances(balances);
       });
   }, [transactions, financialData.currentBalance]);
@@ -186,7 +216,11 @@ export default function Transactions() {
           {transactions.length > 0 && (
             <button
               onClick={() => {
-                if (window.confirm("Are you sure you want to clear all transactions? This action cannot be undone.")) {
+                if (
+                  window.confirm(
+                    "Are you sure you want to clear all transactions? This action cannot be undone."
+                  )
+                ) {
                   clearTransactions();
                 }
               }}
@@ -231,7 +265,9 @@ export default function Transactions() {
                       <p className="text-gray-400 text-sm">{t.date}</p>
                       {transactionBalances.has(t.id) && (
                         <p className="text-gray-500 text-xs mt-0.5">
-                          ${transactionBalances.get(t.id)!.before.toFixed(2)} =&gt; ${transactionBalances.get(t.id)!.after.toFixed(2)}
+                          ${transactionBalances.get(t.id)!.before.toFixed(2)}{" "}
+                          =&gt; $
+                          {transactionBalances.get(t.id)!.after.toFixed(2)}
                         </p>
                       )}
                     </div>
