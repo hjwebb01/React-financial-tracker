@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { CardSurface } from "./CardSurface";
 
 interface GraphPoint {
   name: string;
@@ -44,7 +45,7 @@ export function BalanceProjectionCard({
         key="start"
         offset="0%"
         stopColor={firstIsPositive ? green : red}
-        stopOpacity={0.35}
+        stopOpacity={0.4}
       />,
     );
 
@@ -59,7 +60,7 @@ export function BalanceProjectionCard({
           key={`mid-${i}`}
           offset={`${offsetPercent}%`}
           stopColor={color}
-          stopOpacity={0.35}
+          stopOpacity={0.4}
         />,
       );
     }
@@ -72,7 +73,7 @@ export function BalanceProjectionCard({
         key="end"
         offset="100%"
         stopColor={lastIsPositive ? green : red}
-        stopOpacity={0.35}
+        stopOpacity={0.4}
       />,
     );
 
@@ -80,7 +81,7 @@ export function BalanceProjectionCard({
   }, [graphData]);
 
   return (
-    <div className="bg-[#2a2a2a] border border-gray-700 rounded-lg p-6">
+    <CardSurface>
       <div className="mb-4">
         <h3 className="text-white text-lg font-semibold mb-1">
           Balance Projection
@@ -100,15 +101,18 @@ export function BalanceProjectionCard({
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4a4a4a" opacity={0.5} />
               <XAxis dataKey="name" stroke="#888" hide />
-              <YAxis stroke="#888" domain={["auto", "auto"]} />
+              <YAxis stroke="#888" domain={["auto", "auto"]} tick={{ fill: "#888", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#1f1f1f",
-                  border: "1px solid #374151",
+                  border: "1px solid #4a4a4a",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
                 }}
-                itemStyle={{ color: "#fff" }}
+                itemStyle={{ color: "#fff", fontSize: "14px" }}
+                labelStyle={{ color: "#888", fontSize: "12px" }}
                 formatter={(value: number) => [
                   `$${value.toFixed(2)}`,
                   "Balance",
@@ -119,7 +123,7 @@ export function BalanceProjectionCard({
                 dataKey="balance"
                 stroke="#888"
                 fill="url(#slopeGradient)"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 dot={false}
               />
             </AreaChart>
@@ -129,27 +133,27 @@ export function BalanceProjectionCard({
 
       <div className="mt-4 flex flex-col gap-4">
         <div>
-          <p className="text-gray-400 text-sm mb-2">Current Balance</p>
+          <p className="text-gray-400 text-sm mb-2 font-medium">Current Balance</p>
           <p className="text-white text-2xl font-semibold">
             ${currentValue.toFixed(2)}
           </p>
         </div>
 
-        <div className="h-0.5 bg-linear-to-r from-blue-500 to-green-500 rounded" />
+        <div className="h-0.5 bg-gradient-to-r from-purple-500 via-cyan-500 to-green-500 rounded-full opacity-60" />
 
         <div>
-          <p className="text-gray-400 text-sm mb-2">Projected Balance</p>
-          <p className="text-green-500 text-2xl font-semibold">
+          <p className="text-gray-400 text-sm mb-2 font-medium">Projected Balance</p>
+          <p className="text-green-400 text-2xl font-semibold">
             ${projectedValue.toFixed(2)}
           </p>
         </div>
 
-        <div className="mt-2 p-3 bg-[#1f1f1f] rounded-md border border-gray-700">
+        <div className="mt-2 p-3 bg-gradient-to-br from-[#1f1f1f] to-[#252525] rounded-md border border-gray-700/50">
           <p className="text-gray-400 text-sm">
             Difference:{" "}
             <span
               className={`font-semibold ${
-                netChange >= 0 ? "text-green-500" : "text-red-500"
+                netChange >= 0 ? "text-green-400" : "text-red-400"
               }`}
             >
               {netChange >= 0 ? "+" : ""}${netChange.toFixed(2)}
@@ -157,6 +161,6 @@ export function BalanceProjectionCard({
           </p>
         </div>
       </div>
-    </div>
+    </CardSurface>
   );
 }
