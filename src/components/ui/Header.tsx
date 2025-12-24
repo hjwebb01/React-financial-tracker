@@ -20,9 +20,9 @@ export function Header({ tabs, activeTab, onTabChange }: HeaderProps) {
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 motion-safe:transition-all motion-reduce:transition-none ${
+                className={`flex-1 mr-2.5 last:mr-0 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 motion-safe:transition-all motion-reduce:transition-none ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]"
+                    ? "bg-linear-to-r from-purple-600 to-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]"
                     : "text-gray-400 hover:text-white hover:bg-gray-700/30"
                 }`}
               >

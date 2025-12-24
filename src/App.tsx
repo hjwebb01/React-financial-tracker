@@ -38,8 +38,10 @@ function App() {
         {/* Backdrop layers: purple/cyan halo + noise texture */}
         <div className="fixed inset-0 pointer-events-none z-0">
           {/* Purple/cyan radial gradient halo */}
-          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-purple-600/20 via-purple-500/10 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] translate-x-1/2 translate-y-1/2 bg-gradient-to-tl from-cyan-600/20 via-cyan-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 bg-linear-to-br from-purple-500/50 via-purple-500/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] translate-x-1/2 translate-y-1/2 bg-linear-to-tl from-cyan-500/50 via-cyan-500/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-1/4 w-[800px] h-[800px] translate-x-1/2 -translate-y-1/2 bg-linear-to-bl from-green-500/50 via-green-500/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-[800px] h-[800px] -translate-x-1/2 translate-y-1/2 bg-linear-to-tr from-red-500/50 via-red-500/15 to-transparent rounded-full blur-3xl" />
           {/* Subtle noise overlay */}
           <div className="absolute inset-0 bg-noise opacity-30" />
         </div>
@@ -52,7 +54,9 @@ function App() {
           />
 
           {/* Main Content */}
-          <main className="max-w-7xl mx-auto px-4 py-8">{renderActivePage()}</main>
+          <main className="max-w-7xl mx-auto px-4 py-8">
+            {renderActivePage()}
+          </main>
         </div>
       </div>
     </FinanceProvider>
